@@ -1,0 +1,5 @@
+PAYMENT_TOPIC = "payment-events"
+PAYOUT_TOPIC = "payout-events"
+FRAUD_TOPIC = "fraud-events"
+REFUND_TOPIC = "refund-events"
+FEE_TOPIC = "fee-events"
