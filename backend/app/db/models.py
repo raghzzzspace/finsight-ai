@@ -1,4 +1,4 @@
-from sqlalchemy import Column, String, Float, DateTime
+from sqlalchemy import Column, String, Float, DateTime, Integer
 from datetime import datetime
 from app.db.database import Base
 
@@ -18,5 +18,7 @@ class Transaction(Base):
     currency = Column(String)
     payment_status = Column(String)
     reporting_category = Column(String)
+
+    fraud_score = Column(Integer, default=0)
 
     created_at = Column(DateTime, default=datetime.utcnow)

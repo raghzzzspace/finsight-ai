@@ -36,3 +36,45 @@ services:
       POSTGRES_DB: finsight
     ports:
       - "5432:5432"
+  
+  trino:
+    image: trinodb/trino:latest
+    container_name: trino
+    ports:
+      - "8080:8080"
+    depends_on:
+      - postgres
+    volumes:
+      - ./backend/app/trino/catalog:/etc/trino/catalog
+
+  airflow:
+    image: apache/airflow:2.8.1
+    container_name: airflow
+    depends_on:
+      - postgres
+    ports:
+      - "8082:8080"
+    environment:
+      AIRFLOW__CORE__EXECUTOR: LocalExecutor
+      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://postgres:postgres@postgres:5432/finsight
+      AIRFLOW__CORE__LOAD_EXAMPLES: "false"
+      AIRFLOW__CORE__FERNET_KEY: "newelcpHZ3QKtwpmPby7ZI41DOaRzVkvkedTPdu8HE4="
+    volumes:
+      - ./airflow/dags:/opt/airflow/dags
+      - ./airflow/logs:/opt/airflow/logs
+      - ./airflow/scripts:/opt/airflow/scripts
+    command: webserver
+  
+  airflow-scheduler:
+    image: apache/airflow:2.8.1
+    container_name: airflow-scheduler
+    restart: always
+    depends_on:
+      - airflow
+    environment:
+      AIRFLOW__CORE__EXECUTOR: LocalExecutor
+      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://postgres:postgres@postgres:5432/finsight
+      AIRFLOW__CORE__FERNET_KEY: "newelcpHZ3QKtwpmPby7ZI41DOaRzVkvkedTPdu8HE4="
+    volumes:
+      - ./airflow/dags:/opt/airflow/dags
+    command: scheduler

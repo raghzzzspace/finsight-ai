@@ -6,11 +6,7 @@ from app.db.models import Transaction
 KAFKA_BROKER = "localhost:9092"
 
 consumer = KafkaConsumer(
-    "payment-events",
-    "refund-events",
-    "payout-events",
-    "fee-events",
-    "fraud-events",
+    "transactions-events",
     bootstrap_servers=KAFKA_BROKER,
     value_deserializer=lambda v: json.loads(v.decode("utf-8")),
     auto_offset_reset="earliest",
@@ -52,7 +48,8 @@ def start_consumer():
 
     for message in consumer:
         event = message.value
-        save_to_db(event)
+        print(f"[Kafka] Consumed: {event['event_id']} - {event['transaction_id']}")
+        # save_to_db(event)
 
 
 if __name__ == "__main__":
